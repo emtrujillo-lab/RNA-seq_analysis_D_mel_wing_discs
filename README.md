@@ -137,12 +137,12 @@ if (dir.exists(raw_dir) &&
 # aligned/Control_1.bam aligned/Control_2.bam aligned/Control_3.bam
 #
 # ----------------------------------
-# IMPORT featureCounts COUNT MATRIX
+# IMPORT featureCounts COUNT MATRIX - sample run
 # ----------------------------------
 counts_file <- "counts/all_samples_counts.txt"
 if (!file.exists(counts_file)) {
   # ── Synthetic demo data (6 samples) ───
-  message("Count file not found — using synthetic demo data (3 MEF2-OE + 3 Control).")
+  message("(3 MEF2-OE + 3 Control).")
   set.seed(2024)
   n_genes <- 14000
   gene_ids <- paste0("FBgn", sprintf("%07d", seq_len(n_genes)))
@@ -173,7 +173,7 @@ message("Count matrix: ", nrow(count_matrix), " genes x ",
 message("Samples: ", paste(colnames(count_matrix), collapse = ", "))
 
 
-# SAMPLE METADATA
+# sample run
 # ----------------------------------
 sample_info <- data.frame(
   sample = colnames(count_matrix),
