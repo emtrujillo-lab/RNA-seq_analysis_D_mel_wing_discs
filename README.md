@@ -104,7 +104,7 @@ if (dir.exists(raw_dir) &&
 
 # SHELL COMMANDS: HISAT2 ALIGNMENT 
 # Run these in a terminal, NOT in R (files may be to big to run, check if run freezes)
-# =====================================
+# --------------------------------------
 # use HISAT2 (single-end mode, no trimming) against dm6.
 #
 # ── Download pre-built HISAT2 dm6 index ───
