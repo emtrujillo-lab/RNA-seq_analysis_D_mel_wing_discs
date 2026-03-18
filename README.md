@@ -136,12 +136,12 @@ if (dir.exists(raw_dir) &&
 # aligned/MEF2_OE_1.bam aligned/MEF2_OE_2.bam aligned/MEF2_OE_3.bam \
 # aligned/Control_1.bam aligned/Control_2.bam aligned/Control_3.bam
 #
-# ----------------------------------
-# IMPORT featureCounts COUNT MATRIX - sample run
+
+# IMPORT featureCounts COUNT MATRIX 
 # ----------------------------------
 counts_file <- "counts/all_samples_counts.txt"
 if (!file.exists(counts_file)) {
-  # ── Synthetic demo data (6 samples) ───
+
   message("(3 MEF2-OE + 3 Control).")
   set.seed(2024)
   n_genes <- 14000
@@ -160,6 +160,7 @@ if (!file.exists(counts_file)) {
   base_mat[301:450, 1:3] <- round(base_mat[301:450, 1:3] / 5) # cell-cycle down
   count_matrix <- base_mat
 } else {
+  
   # ── featureCounts output ────────────
   counts_raw <- read.table(counts_file, header = TRUE, sep = "\t",
                            skip = 1, comment = "#", check.names = FALSE)
@@ -173,7 +174,7 @@ message("Count matrix: ", nrow(count_matrix), " genes x ",
 message("Samples: ", paste(colnames(count_matrix), collapse = ", "))
 
 
-# sample run
+# run
 # ----------------------------------
 sample_info <- data.frame(
   sample = colnames(count_matrix),
@@ -229,7 +230,7 @@ p_pca <- ggplot(pca_data, aes(PC1, PC2, color = condition, label = name)) +
 ggsave("figures/PCA_plot.pdf", p_pca, width = 6.5, height = 5)
 ggsave("figures/PCA_plot.png", p_pca, width = 6.5, height = 5, dpi = 300)
 
-# ── Sample distance heatmap ─────────────
+# ── distance heatmap ─────────────
 
 sampleDists <- dist(t(assay(vsd)))
 ann_col <- data.frame(Condition = sample_info$condition,
@@ -244,6 +245,7 @@ pheatmap(as.matrix(sampleDists),
          color = colorRampPalette(c("#2E75B6", "white"))(100),
          border_color = NA, main = "Sample-to-sample distances (VST)")
 dev.off()
+
 # ── Dispersion plot ─────────────────────
 pdf("figures/Dispersion_plot.pdf", width = 6, height = 5)
 plotDispEsts(dds, main = "DESeq2 dispersion estimates")
