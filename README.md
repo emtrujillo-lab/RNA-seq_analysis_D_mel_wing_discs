@@ -5,7 +5,6 @@ MEF2 Overexpression in Drosophila Imaginal Disc Myoblasts
 dirs <- c("results", "figures")
 invisible(sapply(dirs, function(d) if (!dir.exists(d)) dir.create(d)))
 
-# -------------------------------------
 # INSTALL AND LOAD PACKAGES
 
 if (!requireNamespace("BiocManager", quietly = TRUE))
@@ -64,7 +63,8 @@ message("All packages loaded.")
 # - %GC was 47-50% across all samples (consistent with dm6)
 # - Overall mapping rate to dm6 = 95%
 # - NO trimming was performed (however, this can be completed if reads are not clean)
-# ----------------------------------
+
+
 raw_dir <- "./raw_reads"
 qc_dir <- "./fastqc_results"
 if (dir.exists(raw_dir) &&
@@ -104,7 +104,8 @@ if (dir.exists(raw_dir) &&
 
 # SHELL COMMANDS: HISAT2 ALIGNMENT 
 # Run these in a terminal, NOT in R (files may be to big to run, check if run freezes)
-# --------------------------------------
+
+
 # use HISAT2 (single-end mode, no trimming) against dm6.
 #
 # ── Download pre-built HISAT2 dm6 index ───
@@ -125,7 +126,7 @@ if (dir.exists(raw_dir) &&
 # rm ./aligned/${SAMPLE}.sam
 # done
 #
-# ── Count reads with featureCounts ----------------------------------
+# Count reads with featureCounts 
 # featureCounts \
 # -T 8 \
 # -a Drosophila_melanogaster.BDGP6.46.gtf \
@@ -138,7 +139,6 @@ if (dir.exists(raw_dir) &&
 #
 
 # IMPORT featureCounts COUNT MATRIX 
-# ----------------------------------
 counts_file <- "counts/all_samples_counts.txt"
 if (!file.exists(counts_file)) {
 
@@ -161,7 +161,7 @@ if (!file.exists(counts_file)) {
   count_matrix <- base_mat
 } else {
   
-  # ── featureCounts output ────────────
+  # ── featureCounts output 
   counts_raw <- read.table(counts_file, header = TRUE, sep = "\t",
                            skip = 1, comment = "#", check.names = FALSE)
   count_matrix <- as.matrix(counts_raw[, 7:ncol(counts_raw)])
@@ -175,7 +175,7 @@ message("Samples: ", paste(colnames(count_matrix), collapse = ", "))
 
 
 # run
-# ----------------------------------
+
 sample_info <- data.frame(
   sample = colnames(count_matrix),
   condition = factor(
@@ -190,12 +190,10 @@ message("\nSample metadata:")
 print(sample_info)
 
 # DESeq2 DIFFERENTIAL EXPRESSION
-# ----------------------------------
 # Input : featureCounts raw counts
 # Cutoff : padj < 0.05 (Benjamini-Hochberg)
 # Result : >147 up-regulated genes in MEF2-OE condition
 
-# ----------------------------------
 dds <- DESeqDataSetFromMatrix(
   countData = count_matrix,
   colData = sample_info,
@@ -212,9 +210,8 @@ message("\nSize factors:")
 print(round(sizeFactors(dds), 3))
 
 # QC PLOTS
-# ----------------------------------
 vsd <- vst(dds, blind = TRUE)
-# ── PCA ────────────────────────────
+# ── PCA 
 pca_data <- plotPCA(vsd, intgroup = "condition", returnData = TRUE)
 pct_var <- round(100 * attr(pca_data, "percentVar"), 1)
 p_pca <- ggplot(pca_data, aes(PC1, PC2, color = condition, label = name)) +
@@ -230,7 +227,7 @@ p_pca <- ggplot(pca_data, aes(PC1, PC2, color = condition, label = name)) +
 ggsave("figures/PCA_plot.pdf", p_pca, width = 6.5, height = 5)
 ggsave("figures/PCA_plot.png", p_pca, width = 6.5, height = 5, dpi = 300)
 
-# ── distance heatmap ─────────────
+# ── distance heatmap 
 
 sampleDists <- dist(t(assay(vsd)))
 ann_col <- data.frame(Condition = sample_info$condition,
@@ -246,14 +243,13 @@ pheatmap(as.matrix(sampleDists),
          border_color = NA, main = "Sample-to-sample distances (VST)")
 dev.off()
 
-# ── Dispersion plot ─────────────────────
+# ── Dispersion plot 
 pdf("figures/Dispersion_plot.pdf", width = 6, height = 5)
 plotDispEsts(dds, main = "DESeq2 dispersion estimates")
 dev.off()
 message("QC plots saved.")
 
 # EXTRACT RESULTS AND ANNOTATE
-# ----------------------------------
 # Raw results (threshold: padj < 0.05)
 res_raw <- results(dds,
                    contrast = c("condition", "MEF2_OE", "Control"),
@@ -298,7 +294,6 @@ dev.off()
 message("Results saved.")
 
 # VOLCANO PLOT
-# ----------------------------------
 # Genes to highlight 
 highlight <- c(
   "Act57B", "Act79B", "Act88F", # qPCR-validated actins
@@ -338,13 +333,11 @@ message("Volcano plot saved.")
 
 
 # GENE ONTOLOGY ENRICHMENT
-# ----------------------------------
 # used ClueGO (Bindea et al. 2009), a Cytoscape plug-in.
 # ClueGO is a graphical desktop tool 
 
 
 # SESSION INFO
-# ----------------------------------
 writeLines(capture.output(sessionInfo()), "results/sessionInfo.txt")
 message("\n=== Analysis complete ===")
 message("Raw + analyzed data: https://doi.org/10.17632/777hyfy6h5.1 (Mendeley)")
